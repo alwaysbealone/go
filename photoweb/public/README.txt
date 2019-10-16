@@ -1,0 +1,1 @@
+public文件存放静态渲染文件.css、.js、.image。
