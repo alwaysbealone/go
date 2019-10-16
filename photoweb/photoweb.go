@@ -1,3 +1,6 @@
+/*
+代码出自人民邮电出版社出版的《Go语言编程》
+*/
 package main
 
 import (
