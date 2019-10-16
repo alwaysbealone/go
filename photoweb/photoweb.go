@@ -38,9 +38,9 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		check(err)
 		defer f.Close()
 
-		t, err := ioutil.TempFile(UploadDIR, filename)
+		t, err := os.Create(UploadDIR + "/" + filename)
 		check(err)
-		fmt.Println(filename + "已上传！")
+		log.Println(filename + "已上传！")
 		defer t.Close()
 
 		_, err = io.Copy(t, f)
@@ -54,11 +54,10 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 	imageID := r.FormValue("id")           //接收id=
 	imagePath := UploadDIR + "/" + imageID //组成图形文件存放路径
 	if exists := isExists(imagePath); !exists {
-		fmt.Println("图片不存在！")
 		http.NotFound(w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "image")
+	w.Header().Set("Content-Type", "image/jpg")
 	http.ServeFile(w, r, imagePath)
 }
 
@@ -74,7 +73,6 @@ func isExists(path string) bool {
 //网页上列出文件
 func listHandler(w http.ResponseWriter, r *http.Request) {
 	fileInfoArr, err := ioutil.ReadDir(UploadDIR)
-
 	check(err)
 	locals := make(map[string]interface{})
 	images := []string{}
@@ -82,7 +80,6 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 		images = append(images, fileInfo.Name())
 	}
 	locals["images"] = images
-
 	renderHTML(w, TemplateDIR+"/list.html", locals)
 }
 
@@ -157,7 +154,6 @@ func main() {
 	http.HandleFunc("/view", safeHandler(viewHandler))
 	http.HandleFunc("/upload", safeHandler(uploadHandler))
 	err := http.ListenAndServe(":8080", nil)
-	fmt.Println("aa")
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err.Error())
 	}
